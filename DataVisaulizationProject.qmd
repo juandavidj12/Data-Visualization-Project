@@ -17,6 +17,7 @@ To create the master database, the three databases are merged using the variable
 
 ```{r}
 library(data.table)
+library(kableExtra)
 library(scales)
 library(ggplot2)
 library(tidyr)
@@ -33,7 +34,7 @@ descvars<-c("Name of the Country",
             "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
 ","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
 summaryvars<-data.frame("Variables"=vars,"Description"=descvars)
-kable(summaryvars,format = "html")
+kable(summaryvars,format = "html") |> kable_styling(font_size = 12)
 ```
 
 ## Income Inequality
@@ -62,11 +63,6 @@ data_global_avg$continent<-"Worldwide"
 data_global_avg<- data_global_avg |> select(-avg_inequality,avg_inequality)
 total_avg_data<-rbind(data_avg,data_global_avg)
 
-####
-last_america <- last(total_avg_data$avg_inequality[total_avg_data$continent == "America"])
-last_africa <- last(total_avg_data$avg_inequality[total_avg_data$continent == "Africa"])
-
-
 ```
 
 ```{r}
@@ -77,14 +73,14 @@ ggplot(data= total_avg_data, aes(
     colour = continent,
     group = continent
   )) +
-  geom_line() +
+  geom_line(size = 0.8) +
   scale_colour_manual(
     values = c("Worldwide" = "black", 
-               "Africa" = "purple", 
-               "Asia" = "green", 
-               "Europe" = "blue", 
-               "Oceania" = "red", 
-               "America" = "orange")
+               "Africa" = "red4", 
+               "Asia" = "olivedrab", 
+               "Europe" = "cyan4", 
+               "Oceania" = "royalblue4", 
+               "America" = "gold1")
   ) +
   theme(
     panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
@@ -113,10 +109,11 @@ ggplot(data= total_avg_data, aes(
     breaks = seq(min(total_avg_data$Year), max(total_avg_data$Year), by = 1)
   ) +
   labs(
-    title = "Inequality Income Index by Continent",
-    x = NULL,
-    y = NULL
+    title = "Average Inequality Income Index by Continent",
+    y = "Inequaility Income Index",
+    x = "Year"
   ) +
+  theme(axis.title = element_text(size = 9)) +
   geom_text(
     data = total_avg_data |>  
       group_by(continent) |> 
@@ -126,8 +123,7 @@ ggplot(data= total_avg_data, aes(
     size = 3.5
   ) -> IIContinentGraph
 
-# Imprimir el gráfico
-print(IIContinentGraph)
+
 
 
 
@@ -135,10 +131,141 @@ print(IIContinentGraph)
 
 ```
 
-## Income Inequality
+```{r}
 
-To begin with, it is intriguing to examine the behavior of **InequalityIncome** over recent years. To this end, curves can be generated to illustrate how this variable has evolved overall, by continents, and by HDI groups.
+# Avg Per HDGroup
+data_avg_HD <- data_long  |> 
+  group_by(Year, HDGroup) |>
+  summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
+
+# Global Avg
+data_global_avg <- data_long |>
+  group_by(Year) |>
+  summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
+data_global_avg$HDGroup<-"Worldwide"
+data_global_avg<- data_global_avg |> select(-avg_inequality,avg_inequality)
+total_avg_data2<-rbind(data_avg_HD,data_global_avg)
+
+```
 
 ```{r}
- 
+
+ggplot(data= total_avg_data2, aes(
+    x = Year,
+    y = avg_inequality,
+    colour = HDGroup,
+    group = HDGroup,
+  )) +
+  geom_line(size = 0.8) +
+  scale_colour_manual(
+    values = c("Worldwide" = "black", 
+               "Low" = "red4", 
+               "Medium" = "gold1", 
+               "High" = "green4", 
+               "Very High" = "dodgerblue3")
+  ) +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
+    legend.position = "none",
+  ) +
+  scale_y_continuous(
+        sec.axis = dup_axis(
+      breaks = total_avg_data2 |>
+        group_by(HDGroup) |>
+        summarise(avg_inequality = last(avg_inequality)) |>
+        pull(avg_inequality),
+      labels = total_avg_data2 |>
+        group_by(HDGroup) |>
+        summarise(avg_inequality = last(avg_inequality)) |>
+        pull(HDGroup),
+      name = NULL
+    ),   
+    expand = c(0, 0),
+    limits = c(10, max(total_avg_data2$avg_inequality) * 1.1)
+  ) +
+  scale_x_continuous(
+    expand = c(0, 0),
+    breaks = seq(min(total_avg_data2$Year), max(total_avg_data2$Year), by = 1)
+  ) +
+  labs(
+    title = "Average Inequality Income Index by Human Development Group",
+    y = "Inequaility Income Index",
+    x = "Year"
+  ) +
+  theme(axis.title = element_text(size = 9)) +
+  
+  geom_text(
+    data = total_avg_data2 |>  
+      group_by(HDGroup) |> 
+      slice_tail(n = 1),
+    aes(label = HDGroup, colour = HDGroup),
+    hjust = -0.2, 
+    size = 3.5
+  ) -> IIHDGraph
+
+
+
+```
+
+```{r,dpi=900}
+
+print(IIContinentGraph)
+print(IIHDGraph)
+```
+
+### Average inequality income by Continent
+
+In the first graph, we can observe that in the last decade, the general trend of inequality is decreasing, except for Oceania, which seems to maintain stable values.
+
+If we analyze the behavior by continent, we can note that America has had the most variation in the last decade, lowering its average Inequality Income by almost 3 points.
+
+Regarding Europe, we can note that between 2010 and 2016, it was the only continent that showed slight constant growth in inequality. However, from 2016 to 2021, it was able to recover significantly.
+
+Overall, we see that Africa and America are far above the rest of the continents in terms of inequality levels.
+
+### Average inequality income by Human Development Group
+
+On the other hand, in the second graph, surprisingly, we find that the Human Development Index is not closely related to the Inequality Income Index.
+
+While countries with a very high Human Development Index are far below the average, the rest of the countries, including those with a High Human Development Index, always exceed 25 points in the inequality index. Furthermore, these countries tend to behave very similarly in the last five years of the study period, regardless of their Human Development Group.
+
+## Cost of Life
+
+Continuing with the analysis, it is worth exploring how countries are distributed in terms of the cost of living and purchasing power. Additionally, we can relate these variables to the HDGroup for a sample composed of countries that are interesting to our audience!
+
+```{r}
+filtered_data <- data |> 
+  filter(!is.na(cost_index), !is.na(purchasingpower_index))
+
+# Crear el gráfico de dispersión
+ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index, colour = continent)) +
+    scale_colour_manual(
+    values = c("Worldwide" = "black", 
+               "Africa" = "red4", 
+               "Asia" = "olivedrab", 
+               "Europe" = "cyan4", 
+               "Oceania" = "royalblue4", 
+               "America" = "gold1")
+  ) +
+  geom_point(size= 2.5) +
+    geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed", size = 1) + 
+  labs(
+    title = "Cost of Life vs Power Purchasing",
+    caption = "Information available for 98 countries",
+    x = "Cost of Life",
+    y = "Power Purchasing",
+    color = "Continent"
+  ) +
+  theme(plot.subtitle = element_text(size = 13),
+        axis.title   = element_text(size = 11)) +
+  theme(legend.position = "bottom",
+        panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+       panel.background = element_rect(fill = "white"),
+       panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+       panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
+        legend.background = element_rect(fill = "white", color = NA)) 
+
 ```
