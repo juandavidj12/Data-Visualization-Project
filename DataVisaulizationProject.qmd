@@ -14,7 +14,20 @@ For this project, three different databases will be used. One of them contains i
 To create the master database, the three databases are merged using the variable "Country" as the key. As a result, we obtain a database with the following information for more than 100 countries:
 
 ```{r}
-1 + 1
+library(data.table)
+db1<-fread("cost of life.csv")
+db2<-fread("inequality in income.csv")
+db3<-fread("wealthiest.csv")
+data<-merge(db2,db1,by="country",all.x = T)
+data<-merge(data,db3,by="country",all.x = T)
+vars<-names(data)
+descvars<-c("Name of the Country",
+            "Name of the Continent",
+            "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
+","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
+summaryvars<-cbind(vars,descvars)
+summaryvars
+
 ```
 
 You can add options to executable code like this
