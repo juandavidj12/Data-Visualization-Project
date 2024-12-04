@@ -7,14 +7,29 @@ editor: visual
 
 ## Summary of Data Tables
 
-Having grown up in one of the most unequal societies in the world (Latin America), I have been able to observe the significant impact that economic inequality has on a society, on the behavior of its individuals, their aspirations, and their ideals. While this is a topic with a deep sociological perspective and extensive complexity, for this project, I would like to address simple and interesting relationships between variables related to economic inequality in different countries around the world.
+Having grown up in one of the most unequal societies in the world
+(Latin America), I have been able to observe the significant impact that 
+economic inequality has on a society, on the behavior of its individuals, their 
+aspirations, and their ideals. While this is a topic with a deep sociological 
+perspective and extensive complexity, for this project, I would like to address 
+simple and interesting relationships between variables related to economic 
+inequality in different countries around the world.
 
-For this project, three different databases will be used. One of them contains information on socioeconomic inequality indices and Human Development by country (obtained from Kraggle) . The second database includes information on the cost of living, purchasing power, and average monthly income by country (obtained from Kraggle). Lastly, the third database provides information on the percentage of total monthly income generated in a country that is obtained by the top 10% richest of the population (obtained from World Inequality Database).
+For this project, three different databases will be used. One of them contains 
+information on socioeconomic inequality indices and Human Development by country
+(obtained from Kraggle) . The second database includes information on the cost 
+of living, purchasing power, and average monthly income by country (obtained
+from Kraggle). Lastly, the third database provides information on the percentage
+of total monthly income generated in a country that is obtained by the top 10% 
+richest of the population (obtained from World Inequality Database).
 
-To create the master database, the three databases are merged using the variable "Country" as the key. As a result, we obtain a database with the following information for more than 100 countries:
+To create the master database, the three databases are merged using the variable
+"Country" as the key. As a result, we obtain a database with the following 
+information for more than 100 countries:
 
 ```{r}
 library(data.table)
+library(knitr)
 db1<-fread("cost of life.csv")
 db2<-fread("inequality in income.csv")
 db3<-fread("wealthiest.csv")
@@ -25,10 +40,15 @@ descvars<-c("Name of the Country",
             "Name of the Continent",
             "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
 ","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
-summaryvars<-cbind(vars,descvars)
-summaryvars
+summaryvars<-data.frame("Variables"=vars,"Description"=descvars)
+kable(summaryvars)
 
 ```
+## Income Inequality
+```{r}
+
+```
+
 
 You can add options to executable code like this
 
