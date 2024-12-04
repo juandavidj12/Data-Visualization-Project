@@ -17,6 +17,7 @@ To create the master database, the three databases are merged using the variable
 
 ```{r}
 library(data.table)
+library(scales)
 library(ggplot2)
 library(tidyr)
 library(dplyr)
@@ -48,42 +49,91 @@ data_long <- data_clean |>
   gather(key = "Year", value = "InequalityIncome", 
          InequalityIncome2010:InequalityIncome2021) |> 
   mutate(Year = as.numeric(gsub("InequalityIncome", "", Year)))
-# Calcular los promedios de InequalityIncome por continente y por año
-data_avg <- data_long %>%
-  group_by(Year, continent) %>%
+# Avg Per Continent
+data_avg <- data_long  |> 
+  group_by(Year, continent) |>
   summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
 
-# Calcular el promedio global de InequalityIncome por año
-data_global_avg <- data_long %>%
-  group_by(Year) %>%
+# Global Avg
+data_global_avg <- data_long |>
+  group_by(Year) |>
   summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
+data_global_avg$continent<-"Worldwide"
+data_global_avg<- data_global_avg |> select(-avg_inequality,avg_inequality)
+total_avg_data<-rbind(data_avg,data_global_avg)
 
-# Graficar con ggplot
-ggplot() +
-  # Curva para el promedio global
-  geom_line(data = data_global_avg, aes(x = Year, y = avg_inequality), 
-            color = "black", size = 1.5, linetype = "solid") +
-  
-  # Curvas para el promedio por continente
-  geom_line(data = data_avg, aes(x = Year, y = avg_inequality, color = continent), 
-            size = 1.2) +
-  
-  # Personalizar el gráfico
-  labs(title = "Tendencia de la Desigualdad de Ingresos por Continente y Promedio Global",
-       x = "Año", y = "Índice de Desigualdad de Ingresos",
-       color = "Continente") +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") + # Paleta de colores
-  theme(
-    plot.title = element_text(size = 16, hjust = 0.5),
-    axis.title = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10)
-  )
+####
+last_america <- last(total_avg_data$avg_inequality[total_avg_data$continent == "America"])
+last_africa <- last(total_avg_data$avg_inequality[total_avg_data$continent == "Africa"])
+
 
 ```
 
+```{r}
 
+ggplot(data= total_avg_data, aes(
+    x = Year,
+    y = avg_inequality,
+    colour = continent,
+    group = continent
+  )) +
+  geom_line() +
+  scale_colour_manual(
+    values = c("Worldwide" = "black", 
+               "Africa" = "purple", 
+               "Asia" = "green", 
+               "Europe" = "blue", 
+               "Oceania" = "red", 
+               "America" = "orange")
+  ) +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
+    legend.position = "none",
+  ) +
+  scale_y_continuous(
+        sec.axis = dup_axis(
+      breaks = total_avg_data |>
+        group_by(continent) |>
+        summarise(avg_inequality = last(avg_inequality)) |>
+        pull(avg_inequality),
+      labels = total_avg_data |>
+        group_by(continent) |>
+        summarise(avg_inequality = last(avg_inequality)) |>
+        pull(continent),
+      name = NULL
+    ),   
+    expand = c(0, 0),
+    limits = c(10, max(total_avg_data$avg_inequality) * 1.1)
+  ) +
+  scale_x_continuous(
+    expand = c(0, 0),
+    breaks = seq(min(total_avg_data$Year), max(total_avg_data$Year), by = 1)
+  ) +
+  labs(
+    title = "Inequality Income Index by Continent",
+    x = NULL,
+    y = NULL
+  ) +
+  geom_text(
+    data = total_avg_data |>  
+      group_by(continent) |> 
+      slice_tail(n = 1),  # Selecciona el último valor de cada continente
+    aes(label = continent, colour = continent),
+    hjust = -0.2,  # Ajusta la posición de la etiqueta
+    size = 3.5
+  ) -> IIContinentGraph
+
+# Imprimir el gráfico
+print(IIContinentGraph)
+
+
+
+
+
+```
 
 ## Income Inequality
 
