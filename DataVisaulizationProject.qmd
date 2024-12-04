@@ -5,30 +5,21 @@ format: html
 editor: visual
 ---
 
+# Inequaility Income
+
+Having grown up in one of the most unequal societies in the world (Latin America), I have been able to observe the significant impact that economic inequality has on a society, on the behavior of its individuals, their aspirations, and their ideals. While this is a topic with a deep sociological perspective and extensive complexity, for this project, I would like to address simple and interesting relationships between variables related to economic inequality in different countries around the world.
+
 ## Summary of Data Tables
 
-Having grown up in one of the most unequal societies in the world
-(Latin America), I have been able to observe the significant impact that 
-economic inequality has on a society, on the behavior of its individuals, their 
-aspirations, and their ideals. While this is a topic with a deep sociological 
-perspective and extensive complexity, for this project, I would like to address 
-simple and interesting relationships between variables related to economic 
-inequality in different countries around the world.
+For this project, three different databases will be used. One of them contains information on socioeconomic inequality indices and Human Development by country (obtained from Kraggle) . The second database includes information on the cost of living, purchasing power, and average monthly income by country (obtained from Kraggle). Lastly, the third database provides information on the percentage of total monthly income generated in a country that is obtained by the top 10% richest of the population (obtained from World Inequality Database).
 
-For this project, three different databases will be used. One of them contains 
-information on socioeconomic inequality indices and Human Development by country
-(obtained from Kraggle) . The second database includes information on the cost 
-of living, purchasing power, and average monthly income by country (obtained
-from Kraggle). Lastly, the third database provides information on the percentage
-of total monthly income generated in a country that is obtained by the top 10% 
-richest of the population (obtained from World Inequality Database).
-
-To create the master database, the three databases are merged using the variable
-"Country" as the key. As a result, we obtain a database with the following 
-information for more than 100 countries:
+To create the master database, the three databases are merged using the variable "Country" as the key. As a result, we obtain a database with the following information for more than 100 countries:
 
 ```{r}
 library(data.table)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
 library(knitr)
 db1<-fread("cost of life.csv")
 db2<-fread("inequality in income.csv")
@@ -41,20 +32,63 @@ descvars<-c("Name of the Country",
             "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
 ","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
 summaryvars<-data.frame("Variables"=vars,"Description"=descvars)
-kable(summaryvars)
-
+kable(summaryvars,format = "html")
 ```
+
 ## Income Inequality
+
+To begin with, it is intriguing to examine the behavior of **InequalityIncome** over recent years. To this end, curves can be generated to illustrate how this variable has evolved overall, by continents, and by HDI groups.
+
 ```{r}
+ data_clean <- data[complete.cases(data[, .(InequalityIncome2010, InequalityIncome2011, InequalityIncome2012, 
+                                           InequalityIncome2013, InequalityIncome2014, InequalityIncome2015,
+                                           InequalityIncome2016, InequalityIncome2017, InequalityIncome2018,
+                                           InequalityIncome2019, InequalityIncome2020, InequalityIncome2021)]), ]
+data_long <- data_clean |> 
+  gather(key = "Year", value = "InequalityIncome", 
+         InequalityIncome2010:InequalityIncome2021) |> 
+  mutate(Year = as.numeric(gsub("InequalityIncome", "", Year)))
+# Calcular los promedios de InequalityIncome por continente y por año
+data_avg <- data_long %>%
+  group_by(Year, continent) %>%
+  summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
+
+# Calcular el promedio global de InequalityIncome por año
+data_global_avg <- data_long %>%
+  group_by(Year) %>%
+  summarize(avg_inequality = mean(InequalityIncome, na.rm = TRUE))
+
+# Graficar con ggplot
+ggplot() +
+  # Curva para el promedio global
+  geom_line(data = data_global_avg, aes(x = Year, y = avg_inequality), 
+            color = "black", size = 1.5, linetype = "solid") +
+  
+  # Curvas para el promedio por continente
+  geom_line(data = data_avg, aes(x = Year, y = avg_inequality, color = continent), 
+            size = 1.2) +
+  
+  # Personalizar el gráfico
+  labs(title = "Tendencia de la Desigualdad de Ingresos por Continente y Promedio Global",
+       x = "Año", y = "Índice de Desigualdad de Ingresos",
+       color = "Continente") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") + # Paleta de colores
+  theme(
+    plot.title = element_text(size = 16, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
 
 ```
 
 
-You can add options to executable code like this
+
+## Income Inequality
+
+To begin with, it is intriguing to examine the behavior of **InequalityIncome** over recent years. To this end, curves can be generated to illustrate how this variable has evolved overall, by continents, and by HDI groups.
 
 ```{r}
-#| echo: false
-2 * 2
+ 
 ```
-
-The `echo: false` option disables the printing of code (only output is displayed).
