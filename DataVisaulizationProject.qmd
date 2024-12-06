@@ -232,7 +232,7 @@ On the other hand, in the second graph, surprisingly, we find that the Human Dev
 
 While countries with a very high Human Development Index are far below the average, the rest of the countries, including those with a High Human Development Index, always exceed 25 points in the inequality index. Furthermore, these countries tend to behave very similarly in the last five years of the study period, regardless of their Human Development Group.
 
-## Cost of Life
+## Cost of Life vs Purchasing Power
 
 Continuing with the analysis, it is worth exploring how countries are distributed in terms of the cost of living and purchasing power. Additionally, we can relate these variables to the HDGroup for a sample composed of countries that are interesting to our audience!
 
@@ -269,3 +269,9 @@ ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index, colo
         legend.background = element_rect(fill = "white", color = NA)) 
 
 ```
+
+Analyzing the graph, we can observe that the points located on the line y=xy = x represent countries where the average citizen has purchasing power greater than the cost of living. This means they can afford everything necessary for living without difficulty. On the other hand, the points below the line represent countries where the cost of living exceeds the average citizens' purchasing power.
+
+We can note that only Asian and European countries are positioned above the equilibrium curve. Furthermore, the Asian countries above the curve are in a better situation, as their Purchasing Power not only exceeds the Cost of Living but also differs significantly from it—a scenario not observed with the European countries.
+
+On the other hand, we notice that, in general, the countries of the Americas are not only below the curve but also significantly distant from it, indicating a severe imbalance between the Cost of Living and Purchasing Power.
