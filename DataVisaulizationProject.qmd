@@ -3,6 +3,12 @@ title: "Data Visualization Project"
 author: "Juan David Jaramillo"
 format: html
 editor: visual
+knitr:
+  opts_chunk:
+    warning: false
+execute:
+  echo: false  # Oculta el código
+  output: true
 ---
 
 # Inequaility Income
@@ -13,7 +19,7 @@ Having grown up in one of the most unequal societies in the world (Latin America
 
 For this project, three different databases will be used. One of them contains information on socioeconomic inequality indices and Human Development by country (obtained from Kraggle) . The second database includes information on the cost of living, purchasing power, and average monthly income by country (obtained from Kraggle). Lastly, the third database provides information on the percentage of total monthly income generated in a country that is obtained by the top 10% richest of the population (obtained from World Inequality Database).
 
-To create the master database, the three databases are merged using the variable "Country" as the key. As a result, we obtain a database with the following information for more than 100 countries:
+To create the master database, the three databases are merged using the variable "Country" as the key. As a result, we obtain a database with the following information for more than 190 countries:
 
 ```{r}
 library(data.table)
