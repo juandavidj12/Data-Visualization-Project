@@ -454,7 +454,7 @@ ggplot(filtered_income_data_sam2, aes(x = monthly_income_numeric, y = reorder(co
 
 TEXTO
 
-### Which citizens are going to "enjoy" the most an international travel?
+### Which citizens will "enjoy" an international travel the most?
 
 !["Explanation ¿Who does enjoy the most?"](expl.png){width="80%"}
 
