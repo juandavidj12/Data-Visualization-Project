@@ -37,8 +37,8 @@ data<-merge(data,db3,by="country",all.x = T)
 vars<-names(data)
 descvars<-c("Name of the Country",
             "Name of the Continent",
-            "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
-","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
+            "Human Development Group: Low,Medium,High,Very High", "Index of Inequality Income: Number from 0 to 100","","","","","","","","","","","","Cost of Life Index:  A numerical value that quantifies the cost of living in each country
+","Average monthly income in USD","Purchasing Power Index: A numerical value that quantifies the purchasing power of the population in each country","Percentage of the total income of a country which is obtained for the 10% wealthiest")
 summaryvars<-data.frame("Variables"=vars,"Description"=descvars)
 kable(summaryvars,format = "html") |> kable_styling(font_size = 12)
 ```
