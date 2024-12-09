@@ -450,7 +450,7 @@ TEXTO
 
 ### Which citizens are going to "enjoy" the most an international travel?
 
-!["Explanation ¿Who does enjoy the most?"](C:/Users/juand/Documents/R%20y%20Python/Data-Visualization-Project/expl.png){width="80%"}
+!["Explanation ¿Who does enjoy the most?"](expl.png){width="80%"}
 
 TEXTO
 
@@ -487,7 +487,7 @@ TEXTO
 
 ## ¿Which are the best countries for wealthy people?
 
-!["Explanation Best country for whealtiest"](C:/Users/juand/Documents/R%20y%20Python/Data-Visualization-Project/expl2.png){width="80%"}
+!["Explanation Best country for wealthiest"](expl2.png){width="80%"}
 
 TEXTO
 
