@@ -259,10 +259,10 @@ ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index, colo
   geom_point(size= 2.5) +
     geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed", size = 1) + 
   labs(
-    title = "Cost of Life vs Power Purchasing",
+    title = "Cost of Life vs Purchasing Power",
     caption = "Information available for 98 countries",
     x = "Cost of Life",
-    y = "Power Purchasing",
+    y = "Purchasing Power",
     color = "Continent"
   ) +
   theme(plot.subtitle = element_text(size = 13),
