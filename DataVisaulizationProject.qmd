@@ -240,7 +240,7 @@ Continuing with the analysis, it is worth exploring how countries are distribute
 filtered_data <- data |> 
   filter(!is.na(cost_index), !is.na(purchasingpower_index))
 
-# Crear el gráfico de dispersión
+#####
 ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index, colour = continent)) +
     scale_colour_manual(
     values = c("Worldwide" = "black", 
@@ -266,12 +266,231 @@ ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index, colo
        panel.background = element_rect(fill = "white"),
        panel.grid.major = element_line(color = "grey", linewidth = 0.5),
        panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
-        legend.background = element_rect(fill = "white", color = NA)) 
+        legend.background = element_rect(fill = "white", color = NA)) -> vs1
 
 ```
 
-Analyzing the graph, we can observe that the points located on the line y=xy = x represent countries where the average citizen has purchasing power greater than the cost of living. This means they can afford everything necessary for living without difficulty. On the other hand, the points below the line represent countries where the cost of living exceeds the average citizens' purchasing power.
+```{r}
+# Vector con los nombres de los países en 'sam'
+sam <- c("India","Bulgaria","Luxembourg","Colombia","Iran","Singapore", "Haiti","Algeria","China","Greece", "Nigeria", "Uganda", "Hong Kong", "Qatar", "Kuwait","Pakistan","Uganda","Japan","Germany", "United States")
+
+# Crear una nueva columna para diferenciar los países en 'sam'
+filtered_data <- filtered_data |> 
+  mutate(highlight = ifelse(country %in% sam, "highlight", "other"))
+
+# Gráfico
+ggplot(data = filtered_data, aes(x = cost_index, y = purchasingpower_index)) +
+  geom_point(data = subset(filtered_data, highlight == "other"),
+             aes(color = "other"), 
+             size = 2.5, alpha = 0.3) + # Puntos grises y translúcidos para 'other'
+  geom_point(data = subset(filtered_data, highlight == "highlight"),
+             aes(color = continent), 
+             size = 3) + # Puntos destacados por continente
+  geom_text(data = subset(filtered_data, highlight == "highlight"),
+            aes(label = country), hjust= -0.2, vjust= 0.7, size = 3.5) + # Etiquetas para los países en 'sam'
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed", size = 1) + 
+  scale_colour_manual(
+    values = c(
+      "other" = "grey70", # Color gris para los países no destacados
+      "Worldwide" = "black", 
+      "Africa" = "red4", 
+      "Asia" = "olivedrab", 
+      "Europe" = "cyan4", 
+      "Oceania" = "royalblue4", 
+      "America" = "gold1"
+    ),
+    guide = "none" # Ocultar leyenda para 'other'
+  ) +
+  labs(
+    title = "Cost of Life vs Power Purchasing",
+    caption = "Information available for 98 countries",
+    x = "Cost of Life",
+    y = "Purchasing Power",
+    color = "Continent"
+  ) +
+  theme(plot.subtitle = element_text(size = 13),
+        axis.title   = element_text(size = 11)) +
+  theme(legend.position = "bottom",
+        panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+        panel.background = element_rect(fill = "white"),
+        panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+        panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
+        legend.background = element_rect(fill = "white", color = NA))->vs2
+
+```
+
+```{r}
+print(vs1)
+print(vs2)
+```
+
+*Graph 1*
+
+Analyzing the graph, we can observe that the points located on the line y=x represent countries where the average citizen has purchasing power greater than the cost of living. This means they can afford everything necessary for living without difficulty. On the other hand, the points below the line represent countries where the cost of living exceeds the average citizens' purchasing power.
 
 We can note that only Asian and European countries are positioned above the equilibrium curve. Furthermore, the Asian countries above the curve are in a better situation, as their Purchasing Power not only exceeds the Cost of Living but also differs significantly from it—a scenario not observed with the European countries.
 
 On the other hand, we notice that, in general, the countries of the Americas are not only below the curve but also significantly distant from it, indicating a severe imbalance between the Cost of Living and Purchasing Power.
+
+*Graph 2*
+
+TEXTO
+
+## Monthly Income Distribution
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Crear una nueva base filtrada y limpiar 'monthly_income'
+filtered_income_data <- data %>%
+  filter(!is.na(monthly_income)) %>% # Excluir NA
+  mutate(
+    monthly_income_numeric = as.numeric(gsub(",", "", gsub(" USD", "", monthly_income))) # Limpiar y convertir
+  )
+
+# Crear el gráfico de boxplot con bordes y rellenos del mismo color
+ggplot(filtered_income_data, aes(x = continent, y = monthly_income_numeric, fill = continent, color = continent)) +
+  geom_boxplot(
+    alpha = 0.6, # Transparencia del relleno
+    size = 1 # Grosor de los bordes
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Africa" = "red4", 
+      "Asia" = "olivedrab", 
+      "Europe" = "cyan4", 
+      "Oceania" = "royalblue4", 
+      "America" = "gold1"
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "Africa" = "red4", 
+      "Asia" = "olivedrab", 
+      "Europe" = "cyan4", 
+      "Oceania" = "royalblue4", 
+      "America" = "gold1"
+    )
+  ) +
+  labs(
+    title = "Monthly Income Distribution by Continent",
+    x = "Continent",
+    y = "Monthly Income (in USD)"
+  ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "none", # Ocultar la leyenda
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+TEXTO
+
+## Interesting Questions
+
+### Which citizens have more money to spend on international travel?
+
+TEXTO
+
+```{r}
+sam2 <- c("India","Bulgaria","Luxembourg","Colombia","Iran","Cameroon", "Haiti","Algeria","China","Greece", "Nigeria", "Uganda", "Tanzania", "Qatar", "Kuwait","Pakistan","Uganda","Japan","Germany", "United States", "Switzerland", "Iceland", "Mexico", "South Africa")
+
+# Filtrar datos para incluir solo los países en 'sam2'
+filtered_income_data_sam2 <- filtered_income_data %>%
+  filter(country %in% sam2 & !duplicated(country))
+
+# Crear gráfico de barras horizontal con bordes coloreados y sin leyenda para bordes
+ggplot(filtered_income_data_sam2, aes(x = monthly_income_numeric, y = reorder(country, monthly_income_numeric), fill = continent, color = continent)) +
+  geom_bar(stat = "identity", alpha = 0.6, size = 1) + # Barra con transparencia y borde
+  scale_fill_manual(
+    values = c(
+      "Africa" = "red4", 
+      "Asia" = "olivedrab", 
+      "Europe" = "cyan4", 
+      "Oceania" = "royalblue4", 
+      "America" = "gold1"
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "Africa" = "red4", 
+      "Asia" = "olivedrab", 
+      "Europe" = "cyan4", 
+      "Oceania" = "royalblue4", 
+      "America" = "gold1"
+    )
+  ) +
+  labs(
+    title = "Monthly Income by Country",
+    x = "Monthly Income (in USD)",
+    y = "Country",
+    fill = "continent" # Leyenda de continente por color
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "bottom", # Posición de la leyenda
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_blank(),
+    # Eliminar leyenda de color (bordes)
+    guides(color = "none"),  plot.margin = margin(10, 10, 50, 10)
+  )
+
+
+```
+
+TEXTO
+
+### Which citizens are going to "enjoy" the most an international travel?
+
+!["Explanation ¿Who does enjoy the most?"](C:/Users/juand/Documents/R%20y%20Python/Data-Visualization-Project/expl.png){width="80%"}
+
+TEXTO
+
+```{r}
+ggplot(filtered_income_data_sam2, aes(x = monthly_income_numeric, y = reorder(country, monthly_income_numeric), fill = cost_index)) +
+  geom_bar(stat = "identity", alpha = 0.8, size = 1) + # Barra con bordes y relleno
+  scale_fill_gradient2(
+    low = "green",     # Valores bajos en verde
+    mid = "yellow",    # Valores intermedios en amarillo
+    high = "red",      # Valores altos en rojo
+    midpoint = median(filtered_income_data_sam2$cost_index), # Poner el punto medio en el valor mediano
+    space = "Lab"      # Usar espacio de color más perceptual
+  ) +  
+  labs(
+    title = "Monthly Income by Country",
+    x = "Monthly Income (in USD)",
+    y = "Country",
+    fill = "Cost of Index" # Título de la leyenda de relleno
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "bottom", # Mostrar la leyenda en la parte inferior
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_blank()
+  )
+
+
+```
+
+TEXTO
+
+## ¿Which are the best countries for wealthy people?
+
+!["Explanation Best country for whealtiest"](C:/Users/juand/Documents/R%20y%20Python/Data-Visualization-Project/expl2.png){width="80%"}
+
+TEXTO
+
+```{r}
+
+```
