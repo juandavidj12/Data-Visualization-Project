@@ -406,7 +406,7 @@ filtered_income_data_sam2 <- filtered_income_data %>%
 
 # Crear gráfico de barras horizontal con bordes coloreados y sin leyenda para bordes
 ggplot(filtered_income_data_sam2, aes(x = monthly_income_numeric, y = reorder(country, monthly_income_numeric), fill = continent, color = continent)) +
-  geom_bar(stat = "identity", alpha = 0.6, size = 1) + # Barra con transparencia y borde
+  geom_bar(stat = "identity", alpha = 0.6, size = 0.8) + # Barra con transparencia y borde
   scale_fill_manual(
     values = c(
       "Africa" = "red4", 
@@ -492,5 +492,122 @@ TEXTO
 TEXTO
 
 ```{r}
+# Crear una nueva columna numérica para 'shareofwhealtiest'
+filtered_data <- data |> 
+  filter(!is.na(cost_index), !is.na(shareofwealthiest)) |> 
+  mutate(shareofwhealtiest_numeric = as.numeric(gsub("%", "", shareofwealthiest)))
+
+# Calcular los promedios de las variables para la cruz
+mean_x <- mean(filtered_data$shareofwhealtiest_numeric, na.rm = TRUE)
+mean_y <- mean(filtered_data$cost_index, na.rm = TRUE)
+
+# Crear el gráfico
+ggplot(data = filtered_data, aes(x = shareofwhealtiest_numeric, y = cost_index, colour = continent)) +
+  geom_point(size = 2.5) +
+  geom_vline(xintercept = 45, color = "black", linetype = "dashed", size = 1) + # Línea vertical en el promedio de X
+  geom_hline(yintercept = 75, color = "black", linetype = "dashed", size = 1) + # Línea horizontal en el promedio de Y
+  scale_colour_manual(
+    values = c("Worldwide" = "black", 
+               "Africa" = "red4", 
+               "Asia" = "olivedrab", 
+               "Europe" = "cyan4", 
+               "Oceania" = "royalblue4", 
+               "America" = "gold1")
+  ) +
+  labs(
+    title = "Share of Wealthiest vs Cost Index",
+    x = "Share of Wealthiest (%)",
+    y = "Cost of Life Index",
+    color = "Continent"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "bottom",
+    panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_line(color = "grey", linewidth = 0.25),
+    legend.background = element_rect(fill = "white", color = NA)
+  ) -> rich1
 
 ```
+
+```{r}
+# Crear una nueva columna numérica para 'shareofwhealtiest' y destacar países en 'sam3'
+sam3 <- c("India", "Bulgaria", "Luxembourg", "Colombia", "Iran", "Haiti", "Algeria", "China", "Greece", 
+          "Uganda", "Norway", "Qatar", "Kuwait", "Pakistan", 
+          "Japan", "Germany", "United States", "Switzerland", 
+          "Iceland", "Mexico", "South Africa")
+
+filtered_data <- data |> 
+  filter(!is.na(cost_index), !is.na(shareofwealthiest)) |> 
+  mutate(
+    shareofwhealtiest_numeric = as.numeric(gsub("%", "", shareofwealthiest)),
+    highlight = ifelse(country %in% sam3, "highlight", "other")  # Destacar países en sam3
+  )
+
+# Calcular los promedios de las variables para la cruz
+mean_x <- mean(filtered_data$shareofwhealtiest_numeric, na.rm = TRUE)
+mean_y <- mean(filtered_data$cost_index, na.rm = TRUE)
+
+# Crear el gráfico
+ggplot(data = filtered_data, aes(x = shareofwhealtiest_numeric, y = cost_index)) +
+  # Puntos grises y translúcidos para los países no destacados
+  geom_point(data = subset(filtered_data, highlight == "other"), 
+             color = "grey70", 
+             size = 2.5, 
+             alpha = 0.3) +
+  # Puntos destacados para los países en sam3 con colores por continente
+  geom_point(data = subset(filtered_data, highlight == "highlight"), 
+             aes(color = continent), 
+             size = 3) +
+  # Etiquetas para los países en sam3
+  geom_text(data = subset(filtered_data, highlight == "highlight"),
+            aes(label = country), 
+            hjust = -0.2, vjust = 0.7, size = 3) +
+  # Líneas divisorias (cruz)
+  geom_vline(xintercept = 45, color = "black", linetype = "dashed", size = 1) +
+  geom_hline(yintercept = 75, color = "black", linetype = "dashed", size = 1) +
+  # Colores personalizados por continente
+  scale_colour_manual(
+    values = c("Worldwide" = "black", 
+               "Africa" = "red4", 
+               "Asia" = "olivedrab", 
+               "Europe" = "cyan4", 
+               "Oceania" = "royalblue4", 
+               "America" = "gold1")
+  ) +
+  # Etiquetas y título ajustados
+  labs(
+    title = "Share of Wealthiest vs Cost Index",
+    x = "Share of Wealthiest (%)",
+    y = "Cost of Life Index"
+  ) +
+  # Ajuste del rango del eje x
+  xlim(20, 80) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 10, face = "bold"), # Título pequeño
+    axis.title = element_text(size = 10), # Etiquetas de ejes pequeñas
+    axis.text = element_text(size = 9),
+    legend.position = "none", # Sin leyenda
+    panel.border = element_rect(colour = "black", fill = NA, size = 0.8),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_line(color = "grey", linewidth = 0.25)
+  ) -> rich2
+
+# Guardar el gráfico con un tamaño adecuado
+ggsave("grafico_sam3_destacados.png", plot = rich2, width = 14, height = 10, dpi = 300)
+
+
+```
+
+```{r}
+
+print(rich1)
+print(rich2)
+```
+
+TEXT
