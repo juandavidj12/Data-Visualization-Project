@@ -474,7 +474,7 @@ ggplot(filtered_income_data_sam2, aes(x = monthly_income_numeric, y = reorder(co
     title = "Monthly Income by Country",
     x = "Monthly Income (in USD)",
     y = "Country",
-    fill = "Cost of Index" # Título de la leyenda de relleno
+    fill = "Cost of Life Index" # Título de la leyenda de relleno
   ) +
   theme_minimal() +
   theme(
